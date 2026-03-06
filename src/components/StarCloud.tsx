@@ -42,8 +42,6 @@ interface StarCloudProps {
   nodes: ArticleNode[];
   positions: Map<string, [number, number, number]>;
   activeChannel: string;
-  onHover?: (node: ArticleNode | null) => void;
-  onClick?: (node: ArticleNode) => void;
 }
 
 export function StarCloud({
