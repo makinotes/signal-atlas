@@ -3,7 +3,9 @@ const nextConfig = {
   output: "export",
   basePath: "/signal-atlas",
   images: { unoptimized: true },
-  turbopack: {},
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 module.exports = nextConfig;
