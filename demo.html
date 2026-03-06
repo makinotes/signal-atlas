@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Atlas — AI 信源星图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; color: #fff; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; overflow: hidden; }
+  canvas { display: block; }
+
+  /* NASA Eyes style overlay */
+  #ui-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 10;
+  }
+
+  /* Top bar */
+  #top-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 30px;
+  }
+  #logo {
+    font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+  }
+  #logo span { color: #4fc3f7; }
+  #top-nav {
+    display: flex; gap: 30px; pointer-events: auto;
+  }
+  #top-nav a {
+    color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px;
+    letter-spacing: 1px; cursor: pointer; transition: color 0.3s;
+  }
+  #top-nav a:hover { color: #fff; }
+
+  /* Bottom time bar */
+  #time-bar {
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 20px;
+  }
+  #live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #4caf50;
+    box-shadow: 0 0 10px #4caf50; animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+  #date-display {
+    font-size: 18px; letter-spacing: 2px; color: #4fc3f7;
+    font-variant-numeric: tabular-nums;
+  }
+  #time-display {
+    font-size: 14px; color: rgba(255,255,255,0.5);
+  }
+
+  /* Stats cards */
+  #stats {
+    position: absolute; top: 80px; left: 30px;
+    display: flex; flex-direction: column; gap: 15px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 12px 18px; backdrop-filter: blur(10px);
+    min-width: 140px;
+  }
+  .stat-value {
+    font-size: 28px; font-weight: 300; color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+
+  /* Right side controls */
+  #controls {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 10px; pointer-events: auto;
+  }
+  .ctrl-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed; display: none; pointer-events: none;
+    background: rgba(10,15,30,0.95); border: 1px solid rgba(79,195,247,0.3);
+    border-radius: 8px; padding: 14px 18px; backdrop-filter: blur(20px);
+    max-width: 280px; z-index: 100;
+  }
+  #tooltip .tt-name { font-size: 14px; color: #fff; margin-bottom: 6px; }
+  #tooltip .tt-channel { font-size: 10px; color: #4fc3f7; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  #tooltip .tt-category { font-size: 11px; color: rgba(255,255,255,0.5); }
+  #tooltip .tt-tier { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+  #tooltip .tt-score { font-size: 20px; color: #4fc3f7; font-weight: 300; margin-top: 6px; }
+
+  /* Legend */
+  #legend {
+    position: absolute; bottom: 80px; left: 30px;
+    display: flex; gap: 20px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px;
+  }
+  .legend-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  /* Channel filter */
+  #channel-filter {
+    position: absolute; bottom: 80px; right: 30px;
+    display: flex; gap: 10px; pointer-events: auto;
+  }
+  .filter-btn {
+    padding: 6px 14px; border-radius: 20px; font-size: 11px;
+    letter-spacing: 1px; cursor: pointer; transition: all 0.3s;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+  }
+  .filter-btn.active { border-color: rgba(79,195,247,0.5); color: #4fc3f7; background: rgba(79,195,247,0.08); }
+  .filter-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+  /* Constellation labels */
+  .constellation-label {
+    position: fixed; pointer-events: none; z-index: 5;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.15);
+  }
+</style>
+</head>
+<body>
+
+<div id="ui-overlay">
+  <div id="top-bar">
+    <div id="logo">Signal <span>Atlas</span></div>
+    <div id="top-nav">
+      <a>Sources</a>
+      <a>Topics</a>
+      <a>Trends</a>
+      <a>Archive</a>
+    </div>
+  </div>
+
+  <div id="stats">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-sources">197</div>
+      <div class="stat-label">Active Sources</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-channels">3</div>
+      <div class="stat-label">Channels</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-categories">17</div>
+      <div class="stat-label">Categories</div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <div class="ctrl-btn" id="btn-zoom-in">+</div>
+    <div class="ctrl-btn" id="btn-zoom-out">−</div>
+    <div class="ctrl-btn" id="btn-reset">⟲</div>
+  </div>
+
+  <div id="time-bar">
+    <div id="live-dot"></div>
+    <div id="date-display">MAR 05, 2026</div>
+    <div id="time-display"></div>
+  </div>
+
+  <div id="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4fc3f7;box-shadow:0 0 6px #4fc3f7"></div>Overseas</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ab47bc;box-shadow:0 0 6px #ab47bc"></div>WeChat AI</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff7043;box-shadow:0 0 6px #ff7043"></div>WeChat Invest</div>
+  </div>
+
+  <div id="channel-filter">
+    <div class="filter-btn active" data-channel="all">ALL</div>
+    <div class="filter-btn" data-channel="overseas">OVERSEAS</div>
+    <div class="filter-btn" data-channel="wechat-ai">AI</div>
+    <div class="filter-btn" data-channel="wechat-invest">INVEST</div>
+  </div>
+</div>
+
+<div id="tooltip">
+  <div class="tt-channel"></div>
+  <div class="tt-name"></div>
+  <div class="tt-category"></div>
+  <div class="tt-tier"></div>
+  <div class="tt-score"></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+// ============== DATA ==============
+const SOURCES = [{"name":"Lenny's Newsletter","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"One Useful Thing","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"Simon Willison","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"OpenAI Blog","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"Latent Space","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"Peter Yang","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"Every (Dan Shipper)","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"The Pragmatic Engineer","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Greg Isenberg","category":"AI 使用","tier":2,"channel":"overseas"},{"name":"Mckay Wrigley","category":"AI 使用","tier":2,"channel":"overseas"},{"name":"The Algorithmic Bridge","category":"AI 使用","tier":2,"channel":"overseas"},{"name":"Riley Brown","category":"AI 使用","tier":3,"channel":"overseas"},{"name":"Ben's Bites","category":"AI 使用","tier":3,"channel":"overseas"},{"name":"Hamel Husain","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Eugene Yan","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Modal Labs Blog","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Anthropic Cookbook","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Andrej Karpathy","category":"YouTube","tier":1,"channel":"overseas"},{"name":"OpenAI YouTube","category":"YouTube","tier":1,"channel":"overseas"},{"name":"Anthropic YouTube","category":"YouTube","tier":1,"channel":"overseas"},{"name":"Lex Fridman","category":"YouTube","tier":1,"channel":"overseas"},{"name":"TechCrunch","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"Hugging Face Blog","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Google DeepMind Blog","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Import AI","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"Interconnects","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"AI Snake Oil","category":"AI 使用","tier":1,"channel":"overseas"},{"name":"Meta Engineering Blog","category":"Builder 实践","tier":2,"channel":"overseas"},{"name":"Zvi Mowshowitz","category":"AI 观点","tier":1,"channel":"overseas"},{"name":"SemiAnalysis","category":"AI 产业","tier":1,"channel":"overseas"},{"name":"Gary Marcus","category":"AI 观点","tier":1,"channel":"overseas"},{"name":"Stratechery","category":"AI 产业","tier":1,"channel":"overseas"},{"name":"Ahead of AI","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"Understanding AI","category":"AI 使用","tier":2,"channel":"overseas"},{"name":"Davis Summarizes Papers","category":"Builder 实践","tier":2,"channel":"overseas"},{"name":"Gradient Flow","category":"AI 产业","tier":2,"channel":"overseas"},{"name":"Ars Technica AI","category":"AI 使用","tier":2,"channel":"overseas"},{"name":"Fireship","category":"YouTube","tier":2,"channel":"overseas"},{"name":"Yannic Kilcher","category":"YouTube","tier":2,"channel":"overseas"},{"name":"Karpathy Blog","category":"Builder 实践","tier":1,"channel":"overseas"},{"name":"François Chollet","category":"AI 观点","tier":2,"channel":"overseas"},{"name":"Dario Amodei","category":"AI 观点","tier":1,"channel":"overseas"},{"name":"Balaji Srinivasan","category":"AI 产业","tier":2,"channel":"overseas"},{"name":"Peter Steinberger","category":"Builder 实践","tier":2,"channel":"overseas"},{"name":"Amjad Masad","category":"Builder 实践","tier":2,"channel":"overseas"},{"name":"No Priors","category":"AI 产业","tier":1,"channel":"overseas"},
+{"name":"AGI Hunt","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"AI产品黄叔","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"DeepTech深科技","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"Founder Park","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"GeekSavvy","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"InfoQ","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"APPSO","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"AI工程化","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"机器之心","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"量子位","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"新智元","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"PaperWeekly","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"硅基观察Pro","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"AI前线","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"数据派THU","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"极客公园","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"AI寒武纪","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"甲子光年","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"GenAI大模型创投","category":"AI/Tech","tier":1,"channel":"wechat-ai"},{"name":"Product Hunt Daily","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"字节AI","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"腾讯研究院","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"阿里研究院","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"百度AI","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"CSDN","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"SegmentFault","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"掘金","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"OSChina","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AI科技评论","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"智能涌现","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AI梦工厂","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"数智前线","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"卡兹克","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"Koala聊开源","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"云中江树","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"歸藏","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"宝玉xp","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"Simon_阿文","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"Hugging Face","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AI探索时代","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"Halo咯咯","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"渡鸦科技","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AI修猫Prompt","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"苏洋Onojyun","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"第一财经YiMagazine","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"国盛证券研究所","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"钛媒体","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"36氪","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"虎嗅APP","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"爱范儿","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"品玩","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"晚点LatePost","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"界面新闻","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"投资界","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"创业邦","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"亿欧网","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"雷锋网","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"21世纪经济报道","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"财经十一人","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"每日经济新闻","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"澎湃新闻","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"南方都市报","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"极客邦科技","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"IT桔子","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"雷峰网","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"三言Pro","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"刺猬公社","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"腾讯科技","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"华尔街见闻","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"新浪科技","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"智谱AI","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"月之暗面","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"MiniMax","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"零一万物","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"百川智能","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"阶跃星辰","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"深度求索","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"通义实验室","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"商汤科技","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"科大讯飞","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"面壁智能","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"混元HUNYUAN","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"字节跳动技术团队","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"阿里云开发者","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"腾讯云开发者","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"百度开发者中心","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"美团技术团队","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"京东技术","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"微软中国","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"谷歌开发者","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AWS中国","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"英伟达中国","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"Stability AI","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"Cohere","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"Mistral AI","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"LangChain","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"花花的AI工坊","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"不正经的kimol君","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"全球AI资讯汇","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AI先锋官","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"SuperCLUE","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"模型安全Lab","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"RLHF Lab","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AIML.show","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"大模型生态圈","category":"AI/Tech","tier":2,"channel":"wechat-ai"},{"name":"AI Agent工坊","category":"AI/Tech","tier":2,"channel":"wechat-ai"},
+{"name":"2030FY","category":"AI+投资","tier":1,"channel":"wechat-invest"},{"name":"很帅的投资客","category":"投资","tier":1,"channel":"wechat-invest"},{"name":"猫笔刀","category":"投资","tier":1,"channel":"wechat-invest"},{"name":"莱昂做多","category":"美股","tier":1,"channel":"wechat-invest"},{"name":"美股基金策略","category":"美股","tier":2,"channel":"wechat-invest"},{"name":"大空头不做空","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"芝能投研","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"刺客来也","category":"交易","tier":2,"channel":"wechat-invest"},{"name":"ETF进化论","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"培风客","category":"宏观","tier":1,"channel":"wechat-invest"},{"name":"余华莘","category":"宏观","tier":2,"channel":"wechat-invest"},{"name":"付鹏的财经世界","category":"宏观","tier":1,"channel":"wechat-invest"},{"name":"期权时代","category":"期权","tier":1,"channel":"wechat-invest"},{"name":"Options Insider","category":"期权","tier":2,"channel":"wechat-invest"},{"name":"卖方研究员","category":"投行研报","tier":2,"channel":"wechat-invest"},{"name":"老虎证券","category":"美股","tier":2,"channel":"wechat-invest"},{"name":"华尔街见闻","category":"财经","tier":2,"channel":"wechat-invest"},{"name":"财联社","category":"财经","tier":2,"channel":"wechat-invest"},{"name":"远川投资评论","category":"投资","tier":1,"channel":"wechat-invest"},{"name":"美股研究社","category":"美股","tier":2,"channel":"wechat-invest"},{"name":"聪明投资者","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"点拾投资","category":"投资","tier":1,"channel":"wechat-invest"},{"name":"雪球","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"九章投研","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"戴老板","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"硅谷101","category":"科技","tier":1,"channel":"wechat-invest"},{"name":"格隆","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"腾讯科技","category":"腾讯生态","tier":2,"channel":"wechat-invest"},{"name":"期权量化","category":"期权","tier":2,"channel":"wechat-invest"},{"name":"Gamma Scalper","category":"期权","tier":2,"channel":"wechat-invest"},{"name":"投资理想国","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"南洋商业评论","category":"AI","tier":2,"channel":"wechat-invest"},{"name":"牛叫兽读财报","category":"财经","tier":2,"channel":"wechat-invest"},{"name":"思维改变生活","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"锦缎","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"美股指南","category":"美股","tier":2,"channel":"wechat-invest"},{"name":"深燃","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"泽平宏观","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"海投全球","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"商隐社","category":"投资","tier":2,"channel":"wechat-invest"},{"name":"格上理财","category":"AI+投资","tier":2,"channel":"wechat-invest"},{"name":"老鱼选股","category":"投资","tier":2,"channel":"wechat-invest"}];
+
+// ============== COLOR MAP ==============
+const CHANNEL_COLORS = {
+  'overseas':       new THREE.Color(0x4fc3f7),
+  'wechat-ai':      new THREE.Color(0xab47bc),
+  'wechat-invest':  new THREE.Color(0xff7043),
+};
+
+const CHANNEL_LABELS = {
+  'overseas': 'Overseas',
+  'wechat-ai': 'WeChat AI',
+  'wechat-invest': 'WeChat Invest',
+};
+
+// ============== SCENE SETUP ==============
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050510);
+scene.fog = new THREE.FogExp2(0x050510, 0.0008);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000);
+camera.position.set(0, 150, 400);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+// Controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 50;
+controls.maxDistance = 1000;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.3;
+
+// Post-processing: Bloom
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  1.5, 0.4, 0.85
+);
+bloomPass.threshold = 0.1;
+bloomPass.strength = 1.8;
+bloomPass.radius = 0.8;
+composer.addPass(bloomPass);
+
+// ============== BACKGROUND STARS ==============
+const bgStarCount = 3000;
+const bgGeometry = new THREE.BufferGeometry();
+const bgPositions = new Float32Array(bgStarCount * 3);
+const bgSizes = new Float32Array(bgStarCount);
+for (let i = 0; i < bgStarCount; i++) {
+  bgPositions[i * 3] = (Math.random() - 0.5) * 2000;
+  bgPositions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+  bgPositions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+  bgSizes[i] = Math.random() * 1.5 + 0.5;
+}
+bgGeometry.setAttribute('position', new THREE.BufferAttribute(bgPositions, 3));
+bgGeometry.setAttribute('size', new THREE.BufferAttribute(bgSizes, 1));
+
+const bgMaterial = new THREE.ShaderMaterial({
+  uniforms: { time: { value: 0 } },
+  vertexShader: `
+    attribute float size;
+    uniform float time;
+    varying float vAlpha;
+    void main() {
+      vAlpha = 0.3 + 0.7 * abs(sin(time * 0.5 + position.x * 0.01));
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = size * (300.0 / -mvPosition.z);
+      gl_Position = projectionMatrix * mvPosition;
+    }
+  `,
+  fragmentShader: `
+    varying float vAlpha;
+    void main() {
+      float d = length(gl_PointCoord - vec2(0.5));
+      if (d > 0.5) discard;
+      float alpha = smoothstep(0.5, 0.0, d) * vAlpha * 0.6;
+      gl_FragColor = vec4(0.8, 0.85, 1.0, alpha);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+});
+scene.add(new THREE.Points(bgGeometry, bgMaterial));
+
+// ============== ORBITAL RINGS ==============
+const channels = ['overseas', 'wechat-ai', 'wechat-invest'];
+const orbitRadii = { 'overseas': 120, 'wechat-ai': 200, 'wechat-invest': 280 };
+
+channels.forEach(ch => {
+  const radius = orbitRadii[ch];
+  const color = CHANNEL_COLORS[ch];
+  const curve = new THREE.EllipseCurve(0, 0, radius, radius * 0.6, 0, 2 * Math.PI, false, 0);
+  const points = curve.getPoints(128);
+  const geometry = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(p.x, 0, p.y)));
+  const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.08 });
+  const line = new THREE.Line(geometry, material);
+  line.rotation.x = Math.PI * 0.05;
+  scene.add(line);
+});
+
+// ============== SOURCE STARS ==============
+const sourceNodes = [];
+const starGroup = new THREE.Group();
+scene.add(starGroup);
+
+// Create instanced star texture
+const starTexture = createStarTexture();
+
+function createStarTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.1, 'rgba(255,255,255,0.8)');
+  gradient.addColorStop(0.4, 'rgba(255,255,255,0.2)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(canvas);
+}
+
+// Position sources along orbits with category clustering
+const categoryGroups = {};
+SOURCES.forEach(s => {
+  const key = s.channel + '|' + s.category;
+  if (!categoryGroups[key]) categoryGroups[key] = [];
+  categoryGroups[key].push(s);
+});
+
+let globalIndex = 0;
+Object.entries(categoryGroups).forEach(([key, sources]) => {
+  const channel = key.split('|')[0];
+  const baseRadius = orbitRadii[channel];
+  const baseAngle = (globalIndex / SOURCES.length) * Math.PI * 2;
+
+  sources.forEach((source, i) => {
+    const angle = baseAngle + (i / sources.length) * (Math.PI * 2 / Object.keys(categoryGroups).length);
+    const radiusJitter = (Math.random() - 0.5) * 40;
+    const heightJitter = (Math.random() - 0.5) * 30;
+    const r = baseRadius + radiusJitter;
+
+    const x = r * Math.cos(angle);
+    const z = r * 0.6 * Math.sin(angle);
+    const y = heightJitter;
+
+    const color = CHANNEL_COLORS[channel];
+    const size = source.tier === 1 ? 5 : source.tier === 2 ? 3 : 2;
+
+    // Create individual star sprite
+    const spriteMaterial = new THREE.SpriteMaterial({
+      map: starTexture,
+      color: color,
+      transparent: true,
+      opacity: source.tier === 1 ? 1.0 : 0.6,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const sprite = new THREE.Sprite(spriteMaterial);
+    sprite.position.set(x, y, z);
+    sprite.scale.set(size, size, 1);
+    sprite.userData = { source, baseSize: size, phase: Math.random() * Math.PI * 2 };
+    starGroup.add(sprite);
+    sourceNodes.push(sprite);
+  });
+  globalIndex += sources.length;
+});
+
+// ============== CONSTELLATION LINES ==============
+Object.entries(categoryGroups).forEach(([key, sources]) => {
+  if (sources.length < 2) return;
+  const channel = key.split('|')[0];
+  const color = CHANNEL_COLORS[channel];
+  const nodes = sourceNodes.filter(n => {
+    const s = n.userData.source;
+    return s.channel + '|' + s.category === key;
+  });
+
+  // Connect tier 1 sources with faint lines
+  const tier1 = nodes.filter(n => n.userData.source.tier === 1);
+  if (tier1.length >= 2) {
+    const linePoints = [];
+    for (let i = 0; i < tier1.length - 1; i++) {
+      linePoints.push(tier1[i].position, tier1[i + 1].position);
+    }
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
+    const lineMat = new THREE.LineBasicMaterial({
+      color, transparent: true, opacity: 0.06, blending: THREE.AdditiveBlending
+    });
+    scene.add(new THREE.LineSegments(lineGeo, lineMat));
+  }
+});
+
+// ============== CENTER GLOW ==============
+const centerGlowMat = new THREE.SpriteMaterial({
+  map: starTexture,
+  color: 0xffffff,
+  transparent: true,
+  opacity: 0.3,
+  blending: THREE.AdditiveBlending,
+});
+const centerGlow = new THREE.Sprite(centerGlowMat);
+centerGlow.scale.set(40, 40, 1);
+scene.add(centerGlow);
+
+// Small label "SIGNAL ATLAS" at center
+const centerLabel = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: createTextTexture('SIGNAL ATLAS', 'rgba(255,255,255,0.2)'),
+  transparent: true,
+  depthWrite: false,
+}));
+centerLabel.position.set(0, -15, 0);
+centerLabel.scale.set(60, 10, 1);
+scene.add(centerLabel);
+
+function createTextTexture(text, color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.font = '24px SF Mono, Consolas, monospace';
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = '4px';
+  ctx.fillText(text, 256, 32);
+  return new THREE.CanvasTexture(canvas);
+}
+
+// ============== RAYCASTING ==============
+const raycaster = new THREE.Raycaster();
+raycaster.params.Points = { threshold: 5 };
+const mouse = new THREE.Vector2();
+let hoveredNode = null;
+
+document.addEventListener('mousemove', (e) => {
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(sourceNodes);
+
+  const tooltip = document.getElementById('tooltip');
+
+  if (intersects.length > 0) {
+    const node = intersects[0].object;
+    const source = node.userData.source;
+
+    if (hoveredNode !== node) {
+      if (hoveredNode) {
+        hoveredNode.scale.set(hoveredNode.userData.baseSize, hoveredNode.userData.baseSize, 1);
+      }
+      hoveredNode = node;
+      node.scale.set(node.userData.baseSize * 2, node.userData.baseSize * 2, 1);
+    }
+
+    // Simulated quality score based on tier
+    const fakeScore = source.tier === 1 ? (75 + Math.floor(Math.random() * 20)) :
+                      source.tier === 2 ? (55 + Math.floor(Math.random() * 20)) :
+                      (35 + Math.floor(Math.random() * 20));
+
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 15) + 'px';
+    tooltip.style.top = (e.clientY - 10) + 'px';
+    tooltip.querySelector('.tt-channel').textContent = CHANNEL_LABELS[source.channel] || source.channel;
+    tooltip.querySelector('.tt-name').textContent = source.name;
+    tooltip.querySelector('.tt-category').textContent = source.category;
+    tooltip.querySelector('.tt-tier').textContent = 'Tier ' + source.tier;
+    tooltip.querySelector('.tt-score').textContent = fakeScore + ' / 100';
+
+    document.body.style.cursor = 'pointer';
+    controls.autoRotate = false;
+  } else {
+    if (hoveredNode) {
+      hoveredNode.scale.set(hoveredNode.userData.baseSize, hoveredNode.userData.baseSize, 1);
+      hoveredNode = null;
+    }
+    tooltip.style.display = 'none';
+    document.body.style.cursor = 'default';
+    controls.autoRotate = true;
+  }
+});
+
+// ============== CHANNEL FILTER ==============
+let activeChannel = 'all';
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeChannel = btn.dataset.channel;
+
+    sourceNodes.forEach(node => {
+      const source = node.userData.source;
+      if (activeChannel === 'all' || source.channel === activeChannel) {
+        node.visible = true;
+        node.material.opacity = source.tier === 1 ? 1.0 : 0.6;
+      } else {
+        node.visible = false;
+      }
+    });
+  });
+});
+
+// ============== CONTROLS ==============
+document.getElementById('btn-zoom-in').addEventListener('click', () => {
+  camera.position.multiplyScalar(0.8);
+});
+document.getElementById('btn-zoom-out').addEventListener('click', () => {
+  camera.position.multiplyScalar(1.25);
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  camera.position.set(0, 150, 400);
+  controls.target.set(0, 0, 0);
+});
+
+// ============== TIME DISPLAY ==============
+function updateTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById('time-display').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// ============== ANIMATE ==============
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const elapsed = clock.getElapsedTime();
+
+  // Twinkle stars
+  sourceNodes.forEach(node => {
+    const phase = node.userData.phase;
+    const twinkle = 0.7 + 0.3 * Math.sin(elapsed * 1.5 + phase);
+    node.material.opacity = (node.userData.source.tier === 1 ? 1.0 : 0.6) * twinkle;
+  });
+
+  // Background stars twinkle
+  bgMaterial.uniforms.time.value = elapsed;
+
+  // Center glow pulse
+  const pulse = 0.25 + 0.08 * Math.sin(elapsed * 0.8);
+  centerGlowMat.opacity = pulse;
+
+  controls.update();
+  composer.render();
+}
+
+animate();
+
+// ============== RESIZE ==============
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
