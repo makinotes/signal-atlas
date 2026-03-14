@@ -225,6 +225,21 @@
     ]
   },
   {
+    "name": "硅星人Pro",
+    "channel": "wechat-ai",
+    "total_articles": 8,
+    "avg_score": 78.8,
+    "max_score": 87,
+    "tier1_count": 3,
+    "top_keywords": [
+      "coding",
+      "工程师",
+      "agent",
+      "claude",
+      "uber"
+    ]
+  },
+  {
     "name": "PaperWeekly",
     "channel": "wechat-ai",
     "total_articles": 23,
@@ -300,36 +315,6 @@
     ]
   },
   {
-    "name": "PaperAgent",
-    "channel": "wechat-ai",
-    "total_articles": 16,
-    "avg_score": 77.7,
-    "max_score": 95,
-    "tier1_count": 14,
-    "top_keywords": [
-      "智能",
-      "open_source",
-      "论文",
-      "agent",
-      "model"
-    ]
-  },
-  {
-    "name": "硅星人Pro",
-    "channel": "wechat-ai",
-    "total_articles": 7,
-    "avg_score": 77.6,
-    "max_score": 87,
-    "tier1_count": 2,
-    "top_keywords": [
-      "coding",
-      "工程师",
-      "agent",
-      "claude",
-      "技能"
-    ]
-  },
-  {
     "name": "赛博禅心",
     "channel": "wechat-ai",
     "total_articles": 13,
@@ -360,18 +345,18 @@
     ]
   },
   {
-    "name": "夕小瑶科技说",
+    "name": "PaperAgent",
     "channel": "wechat-ai",
-    "total_articles": 8,
+    "total_articles": 17,
     "avg_score": 76.2,
-    "max_score": 87,
-    "tier1_count": 4,
+    "max_score": 95,
+    "tier1_count": 15,
     "top_keywords": [
-      "claude",
-      "model",
-      "coding",
-      "training",
-      "11%"
+      "智能",
+      "open_source",
+      "论文",
+      "agent",
+      "model"
     ]
   },
   {
@@ -390,6 +375,36 @@
     ]
   },
   {
+    "name": "夕小瑶科技说",
+    "channel": "wechat-ai",
+    "total_articles": 9,
+    "avg_score": 75.2,
+    "max_score": 87,
+    "tier1_count": 5,
+    "top_keywords": [
+      "claude",
+      "model",
+      "coding",
+      "微信",
+      "training"
+    ]
+  },
+  {
+    "name": "机器之心",
+    "channel": "wechat-ai",
+    "total_articles": 47,
+    "avg_score": 74.2,
+    "max_score": 95,
+    "tier1_count": 47,
+    "top_keywords": [
+      "model",
+      "open_source",
+      "coding",
+      "agent",
+      "reasoning"
+    ]
+  },
+  {
     "name": "新西楼",
     "channel": "wechat-ai",
     "total_articles": 5,
@@ -405,18 +420,18 @@
     ]
   },
   {
-    "name": "机器之心",
+    "name": "AI工程化",
     "channel": "wechat-ai",
-    "total_articles": 44,
-    "avg_score": 73.8,
-    "max_score": 95,
-    "tier1_count": 44,
+    "total_articles": 19,
+    "avg_score": 73.3,
+    "max_score": 93,
+    "tier1_count": 12,
     "top_keywords": [
       "model",
-      "open_source",
+      "claude",
       "coding",
-      "agent",
-      "智能"
+      "智能",
+      "本地"
     ]
   },
   {
@@ -447,21 +462,6 @@
       "智能",
       "手机",
       "生态"
-    ]
-  },
-  {
-    "name": "AI工程化",
-    "channel": "wechat-ai",
-    "total_articles": 17,
-    "avg_score": 73.1,
-    "max_score": 93,
-    "tier1_count": 10,
-    "top_keywords": [
-      "claude",
-      "coding",
-      "model",
-      "智能",
-      "本地"
     ]
   },
   {
@@ -615,18 +615,33 @@
     ]
   },
   {
+    "name": "AGI Hunt",
+    "channel": "wechat-ai",
+    "total_articles": 15,
+    "avg_score": 71.8,
+    "max_score": 87,
+    "tier1_count": 9,
+    "top_keywords": [
+      "claude",
+      "agent",
+      "model",
+      "生成",
+      "收购"
+    ]
+  },
+  {
     "name": "喜新",
     "channel": "wechat-ai",
-    "total_articles": 4,
-    "avg_score": 72.0,
+    "total_articles": 5,
+    "avg_score": 71.6,
     "max_score": 77,
-    "tier1_count": 2,
+    "tier1_count": 3,
     "top_keywords": [
       "agent",
       "openclaw",
       "演进",
       "梳理",
-      "inference"
+      "插件"
     ]
   },
   {
@@ -647,31 +662,31 @@
   {
     "name": "InfoQ",
     "channel": "wechat-ai",
-    "total_articles": 32,
+    "total_articles": 36,
     "avg_score": 71.0,
     "max_score": 100,
-    "tier1_count": 30,
+    "tier1_count": 34,
     "top_keywords": [
+      "model",
       "agent",
       "架构",
-      "model",
-      "openclaw",
-      "gpt"
+      "gpt",
+      "智能"
     ]
   },
   {
-    "name": "AGI Hunt",
+    "name": "量子位",
     "channel": "wechat-ai",
-    "total_articles": 14,
-    "avg_score": 70.7,
-    "max_score": 85,
-    "tier1_count": 8,
+    "total_articles": 34,
+    "avg_score": 69.6,
+    "max_score": 93,
+    "tier1_count": 34,
     "top_keywords": [
-      "claude",
-      "agent",
       "model",
-      "收购",
-      "社交"
+      "agent",
+      "coding",
+      "iclr",
+      "龙虾"
     ]
   },
   {
@@ -690,18 +705,18 @@
     ]
   },
   {
-    "name": "量子位",
+    "name": "DeepTech深科技",
     "channel": "wechat-ai",
-    "total_articles": 32,
-    "avg_score": 69.4,
+    "total_articles": 50,
+    "avg_score": 68.2,
     "max_score": 93,
-    "tier1_count": 32,
+    "tier1_count": 50,
     "top_keywords": [
       "model",
-      "agent",
-      "iclr",
+      "伟达",
+      "gpt",
       "coding",
-      "2026"
+      "团队"
     ]
   },
   {
@@ -717,21 +732,6 @@
       "agent",
       "workflow",
       "电商"
-    ]
-  },
-  {
-    "name": "DeepTech深科技",
-    "channel": "wechat-ai",
-    "total_articles": 48,
-    "avg_score": 67.8,
-    "max_score": 93,
-    "tier1_count": 48,
-    "top_keywords": [
-      "model",
-      "伟达",
-      "gpt",
-      "coding",
-      "团队"
     ]
   },
   {
@@ -765,6 +765,36 @@
     ]
   },
   {
+    "name": "AI前线",
+    "channel": "wechat-ai",
+    "total_articles": 11,
+    "avg_score": 67.3,
+    "max_score": 93,
+    "tier1_count": 9,
+    "top_keywords": [
+      "agent",
+      "工程师",
+      "gpt",
+      "框架",
+      "团队"
+    ]
+  },
+  {
+    "name": "晚点LatePost",
+    "channel": "wechat-ai",
+    "total_articles": 21,
+    "avg_score": 66.6,
+    "max_score": 87,
+    "tier1_count": 16,
+    "top_keywords": [
+      "智能",
+      "华为",
+      "具身",
+      "融资",
+      "全栈"
+    ]
+  },
+  {
     "name": "张无常",
     "channel": "wechat-ai",
     "total_articles": 8,
@@ -795,63 +825,18 @@
     ]
   },
   {
-    "name": "晚点LatePost",
-    "channel": "wechat-ai",
-    "total_articles": 18,
-    "avg_score": 65.4,
-    "max_score": 87,
-    "tier1_count": 13,
-    "top_keywords": [
-      "华为",
-      "智能",
-      "自研",
-      "供应链",
-      "ceo"
-    ]
-  },
-  {
-    "name": "莫理",
-    "channel": "wechat-ai",
-    "total_articles": 9,
-    "avg_score": 65.3,
-    "max_score": 87,
-    "tier1_count": 4,
-    "top_keywords": [
-      "openclaw",
-      "本地",
-      "技能",
-      "open_source",
-      "豆包"
-    ]
-  },
-  {
     "name": "新智元",
     "channel": "wechat-ai",
-    "total_articles": 32,
+    "total_articles": 37,
     "avg_score": 65.3,
     "max_score": 95,
-    "tier1_count": 27,
+    "tier1_count": 32,
     "top_keywords": [
       "claude",
       "openclaw",
       "model",
-      "算力",
-      "智能"
-    ]
-  },
-  {
-    "name": "AI前线",
-    "channel": "wechat-ai",
-    "total_articles": 9,
-    "avg_score": 65.2,
-    "max_score": 93,
-    "tier1_count": 7,
-    "top_keywords": [
       "agent",
-      "gpt",
-      "智能",
-      "model",
-      "工程师"
+      "模态"
     ]
   },
   {
@@ -870,6 +855,36 @@
     ]
   },
   {
+    "name": "AI信息Gap",
+    "channel": "wechat-ai",
+    "total_articles": 5,
+    "avg_score": 64.2,
+    "max_score": 80,
+    "tier1_count": 4,
+    "top_keywords": [
+      "claude",
+      "上下文",
+      "95%",
+      "model",
+      "400"
+    ]
+  },
+  {
+    "name": "莫理",
+    "channel": "wechat-ai",
+    "total_articles": 10,
+    "avg_score": 63.8,
+    "max_score": 87,
+    "tier1_count": 5,
+    "top_keywords": [
+      "openclaw",
+      "本地",
+      "技能",
+      "open_source",
+      "豆包"
+    ]
+  },
+  {
     "name": "追问nextquestion",
     "channel": "wechat-ai",
     "total_articles": 25,
@@ -882,21 +897,6 @@
       "大脑",
       "daily",
       "agi"
-    ]
-  },
-  {
-    "name": "36氪",
-    "channel": "wechat-ai",
-    "total_articles": 27,
-    "avg_score": 63.4,
-    "max_score": 87,
-    "tier1_count": 27,
-    "top_keywords": [
-      "openclaw",
-      "龙虾",
-      "苹果",
-      "model",
-      "36"
     ]
   },
   {
@@ -927,21 +927,6 @@
       "龙虾",
       "agent",
       "inference"
-    ]
-  },
-  {
-    "name": "Ars Technica AI",
-    "channel": "overseas",
-    "total_articles": 17,
-    "avg_score": 63.1,
-    "max_score": 87,
-    "tier1_count": 7,
-    "top_keywords": [
-      "gemini",
-      "agent",
-      "data",
-      "open_source",
-      "claude"
     ]
   },
   {
@@ -990,63 +975,18 @@
     ]
   },
   {
-    "name": "The Algorithmic Bridge",
-    "channel": "overseas",
-    "total_articles": 13,
-    "avg_score": 62.8,
-    "max_score": 80,
-    "tier1_count": 5,
-    "top_keywords": [
-      "life",
-      "claude",
-      "gpt",
-      "problem",
-      "erase"
-    ]
-  },
-  {
-    "name": "AI信息Gap",
+    "name": "36氪",
     "channel": "wechat-ai",
-    "total_articles": 4,
-    "avg_score": 62.8,
-    "max_score": 80,
-    "tier1_count": 3,
-    "top_keywords": [
-      "claude",
-      "黄仁勋",
-      "五层",
-      "基础设施",
-      "蛋糕"
-    ]
-  },
-  {
-    "name": "极客公园",
-    "channel": "wechat-ai",
-    "total_articles": 25,
-    "avg_score": 62.5,
-    "max_score": 93,
-    "tier1_count": 24,
+    "total_articles": 30,
+    "avg_score": 62.7,
+    "max_score": 87,
+    "tier1_count": 30,
     "top_keywords": [
       "openclaw",
-      "open_source",
-      "agent",
-      "model",
-      "千问"
-    ]
-  },
-  {
-    "name": "虎嗅",
-    "channel": "wechat-ai",
-    "total_articles": 33,
-    "avg_score": 62.2,
-    "max_score": 80,
-    "tier1_count": 32,
-    "top_keywords": [
-      "openclaw",
+      "苹果",
+      "36",
       "龙虾",
-      "2025",
-      "全球",
-      "伊朗"
+      "model"
     ]
   },
   {
@@ -1062,6 +1002,36 @@
       "复利",
       "决策权",
       "验收"
+    ]
+  },
+  {
+    "name": "Ars Technica AI",
+    "channel": "overseas",
+    "total_articles": 18,
+    "avg_score": 61.7,
+    "max_score": 87,
+    "tier1_count": 7,
+    "top_keywords": [
+      "gemini",
+      "agent",
+      "data",
+      "open_source",
+      "claude"
+    ]
+  },
+  {
+    "name": "虎嗅",
+    "channel": "wechat-ai",
+    "total_articles": 35,
+    "avg_score": 61.6,
+    "max_score": 80,
+    "tier1_count": 34,
+    "top_keywords": [
+      "openclaw",
+      "2025",
+      "龙虾",
+      "全球",
+      "伊朗"
     ]
   },
   {
@@ -1095,6 +1065,21 @@
     ]
   },
   {
+    "name": "极客公园",
+    "channel": "wechat-ai",
+    "total_articles": 26,
+    "avg_score": 61.3,
+    "max_score": 93,
+    "tier1_count": 25,
+    "top_keywords": [
+      "openclaw",
+      "极客",
+      "open_source",
+      "agent",
+      "model"
+    ]
+  },
+  {
     "name": "探索AGI",
     "channel": "wechat-ai",
     "total_articles": 13,
@@ -1107,6 +1092,36 @@
       "model",
       "inference",
       "复刻"
+    ]
+  },
+  {
+    "name": "十字路口Crossing",
+    "channel": "wechat-ai",
+    "total_articles": 13,
+    "avg_score": 61.1,
+    "max_score": 87,
+    "tier1_count": 9,
+    "top_keywords": [
+      "agent",
+      "openclaw",
+      "application",
+      "门槛",
+      "创业者"
+    ]
+  },
+  {
+    "name": "有机大橘子",
+    "channel": "wechat-ai",
+    "total_articles": 9,
+    "avg_score": 61.1,
+    "max_score": 83,
+    "tier1_count": 7,
+    "top_keywords": [
+      "agent",
+      "安装",
+      "算力",
+      "智能",
+      "model"
     ]
   },
   {
@@ -1125,33 +1140,33 @@
     ]
   },
   {
-    "name": "有机大橘子",
-    "channel": "wechat-ai",
-    "total_articles": 8,
-    "avg_score": 60.4,
-    "max_score": 83,
-    "tier1_count": 6,
+    "name": "The Algorithmic Bridge",
+    "channel": "overseas",
+    "total_articles": 14,
+    "avg_score": 60.9,
+    "max_score": 80,
+    "tier1_count": 5,
     "top_keywords": [
-      "agent",
-      "安装",
-      "算力",
-      "智能",
-      "model"
+      "weekly",
+      "top",
+      "picks",
+      "life",
+      "claude"
     ]
   },
   {
-    "name": "十字路口Crossing",
+    "name": "甲子光年",
     "channel": "wechat-ai",
-    "total_articles": 12,
-    "avg_score": 60.3,
-    "max_score": 87,
-    "tier1_count": 8,
+    "total_articles": 6,
+    "avg_score": 60.5,
+    "max_score": 73,
+    "tier1_count": 5,
     "top_keywords": [
-      "agent",
-      "openclaw",
-      "application",
-      "门槛",
-      "创业者"
+      "具身",
+      "data",
+      "智能",
+      "闭环",
+      "infra"
     ]
   },
   {
@@ -1170,21 +1185,6 @@
     ]
   },
   {
-    "name": "Z Potentials",
-    "channel": "wechat-ai",
-    "total_articles": 26,
-    "avg_score": 59.9,
-    "max_score": 90,
-    "tier1_count": 24,
-    "top_keywords": [
-      "claude",
-      "gpt",
-      "coding",
-      "agent",
-      "构建"
-    ]
-  },
-  {
     "name": "划重点KeyPoints",
     "channel": "wechat-ai",
     "total_articles": 3,
@@ -1197,6 +1197,21 @@
       "agent",
       "application",
       "特攻队"
+    ]
+  },
+  {
+    "name": "Z Finance",
+    "channel": "wechat-ai",
+    "total_articles": 8,
+    "avg_score": 59.6,
+    "max_score": 70,
+    "tier1_count": 4,
+    "top_keywords": [
+      "字节",
+      "seed",
+      "智能",
+      "agent",
+      "腾讯"
     ]
   },
   {
@@ -1215,33 +1230,18 @@
     ]
   },
   {
-    "name": "甲子光年",
+    "name": "Z Potentials",
     "channel": "wechat-ai",
-    "total_articles": 5,
-    "avg_score": 59.2,
-    "max_score": 73,
-    "tier1_count": 4,
+    "total_articles": 28,
+    "avg_score": 59.0,
+    "max_score": 90,
+    "tier1_count": 24,
     "top_keywords": [
-      "闭环",
-      "具身",
-      "智能",
-      "data",
-      "光轮"
-    ]
-  },
-  {
-    "name": "Z Finance",
-    "channel": "wechat-ai",
-    "total_articles": 7,
-    "avg_score": 59.1,
-    "max_score": 70,
-    "tier1_count": 3,
-    "top_keywords": [
-      "字节",
-      "seed",
-      "智能",
+      "claude",
+      "gpt",
+      "coding",
       "agent",
-      "腾讯"
+      "独角兽"
     ]
   },
   {
@@ -1275,21 +1275,6 @@
     ]
   },
   {
-    "name": "APPSO",
-    "channel": "wechat-ai",
-    "total_articles": 30,
-    "avg_score": 55.8,
-    "max_score": 87,
-    "tier1_count": 30,
-    "top_keywords": [
-      "openclaw",
-      "inference",
-      "龙虾",
-      "视频",
-      "生成"
-    ]
-  },
-  {
     "name": "优设AIGC",
     "channel": "wechat-ai",
     "total_articles": 10,
@@ -1302,6 +1287,21 @@
       "nano",
       "图标",
       "风格"
+    ]
+  },
+  {
+    "name": "APPSO",
+    "channel": "wechat-ai",
+    "total_articles": 32,
+    "avg_score": 55.4,
+    "max_score": 87,
+    "tier1_count": 32,
+    "top_keywords": [
+      "openclaw",
+      "龙虾",
+      "inference",
+      "appso",
+      "苹果"
     ]
   },
   {
@@ -1412,16 +1412,16 @@
   {
     "name": "AI产品黄叔",
     "channel": "wechat-ai",
-    "total_articles": 5,
-    "avg_score": 52.6,
+    "total_articles": 6,
+    "avg_score": 52.7,
     "max_score": 77,
-    "tier1_count": 3,
+    "tier1_count": 4,
     "top_keywords": [
       "openclaw",
       "coding",
-      "付费",
-      "安装",
-      "卸载"
+      "500",
+      "智谱",
+      "安装版"
     ]
   },
   {
@@ -1532,16 +1532,16 @@
   {
     "name": "财联社AI daily",
     "channel": "wechat-ai",
-    "total_articles": 60,
-    "avg_score": 47.0,
+    "total_articles": 61,
+    "avg_score": 47.3,
     "max_score": 73,
-    "tier1_count": 57,
+    "tier1_count": 58,
     "top_keywords": [
       "伊朗",
       "特朗普",
       "霍尔木兹海峡",
-      "美国",
-      "a股"
+      "a股",
+      "美国"
     ]
   },
   {
